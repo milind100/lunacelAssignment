@@ -17,9 +17,15 @@ const SliderButton = ({ children, ...props }) => (
 );
 
 const PhotoGallary = () => {
-  const [slides, setSlides] = useState([1, 2, 3, 4]);
+  const [images, setImages] = useState([
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbdMMDF1lSj4pxrNeB3xFPfewV5Ki5_8R47A&s",
+    "https://wallpapers.com/images/featured/skyscraper-8scefc1q0icwddbz.jpg",
+    "https://e0.pxfuel.com/wallpapers/722/404/desktop-wallpaper-city-skyline-skyscrapers-night-buildings.jpg",
+    "https://wallpaper.forfun.com/fetch/02/025f165ab54fbef0c6f520ba048857da.jpeg",
+  ]);
 
   let sliderRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const next = () => {
     sliderRef.slickNext();
@@ -28,9 +34,16 @@ const PhotoGallary = () => {
     sliderRef.slickPrev();
   };
 
-  const handleAddSlide = () => {
-    setSlides((prev) => [...prev, prev.length + 1]);
-    sliderRef.slickGoTo(slides.length + 1);
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages([...images, reader.result]);
+      };
+      reader.readAsDataURL(file);
+      sliderRef.slickGoTo(images.length + 1);
+    }
   };
 
   var settings = {
@@ -53,11 +66,18 @@ const PhotoGallary = () => {
         <div className="flex  ssm:flex-row  items-center gap-2 md:gap-2 lmg:gap-5 lg:gap-9">
           <div>
             <button
-              onClick={handleAddSlide}
+              onClick={() => fileInputRef.current.click()}
               className="addImages-button text-[8px] ssm:text-[10px] lg:text-xs py-[10px] lg:py-[14px] px-[5px] ssm:px-[15px] xl:px-[20px] rounded-[104px]"
             >
               + Add image
             </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
           </div>
           <div className="flex gap-[8px]  lg:gap-[18px]">
             <SliderButton onClick={previous}>
@@ -77,12 +97,12 @@ const PhotoGallary = () => {
           }}
           {...settings}
         >
-          {slides.map((slide) => (
-            <div key={slide} className="w-full h-full">
+          {images.map((image) => (
+            <div key={image} className="w-full h-full">
               <img
-                src={rectangleImg}
+                src={image}
                 alt="rightArrow logo"
-                className="h-[100px] md:h-full w-full"
+                className="h-[100px] w-full md:h-[150px] md:w-[170px] rounded-2xl"
               />
             </div>
           ))}
